@@ -1,222 +1,1076 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>200L Football League</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>200lvl Football League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1712;
+    --bg-elevated:#0f2119;
+    --bg-card:#132a20;
+    --line:rgba(245,243,236,0.09);
+    --turf:#2fbf6e;
+    --turf-dim:#1c7a47;
+    --amber:#ffb703;
+    --amber-dim:#7a5b0a;
+    --ink:#f5f3ec;
+    --ink-dim:#a7b8ac;
+    --ink-faint:#6b7d70;
+    --yellow:#ffd400;
+    --red:#e5433a;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top, rgba(47,191,110,0.08), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  h1,h2,h3,.display{font-family:'Anton',sans-serif; font-weight:400; letter-spacing:0.5px; text-transform:uppercase;}
+  a{color:inherit;}
+  button{font-family:inherit; cursor:pointer;}
+  input,select{font-family:inherit;}
+
+  /* ===== Top payment banner ===== */
+  .paybar{
+    background:linear-gradient(90deg, var(--turf-dim), var(--bg-elevated));
+    border-bottom:1px solid var(--line);
+    padding:8px 20px;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--ink-dim);
+  }
+  .paybar strong{color:var(--amber); font-family:'JetBrains Mono',monospace;}
+  .paybar button{
+    background:none; border:1px solid var(--line); color:var(--ink-dim);
+    padding:3px 10px; border-radius:6px; font-size:12px;
+  }
+  .paybar button:hover{border-color:var(--turf); color:var(--ink);}
+
+  /* ===== Header / hero ===== */
+  header.hero{
+    padding:28px 20px 18px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  .league-title{
+    font-size:clamp(28px,5vw,46px);
+    color:var(--ink);
+    margin:0;
+    line-height:1;
+  }
+  .league-title span{color:var(--turf);}
+  .league-sub{color:var(--ink-faint); font-size:13px; margin-top:6px; letter-spacing:2px; text-transform:uppercase;}
+
+  .potw{
+    margin-top:20px;
+    background:var(--bg-card);
+    border:1px solid var(--amber-dim);
+    border-radius:var(--radius);
+    padding:14px 26px;
+    display:flex; align-items:center; gap:16px;
+    max-width:520px;
+  }
+  .potw .badge{
+    font-family:'Anton',sans-serif; font-size:11px; letter-spacing:1.5px;
+    color:#1a1408; background:var(--amber); padding:5px 9px; border-radius:5px;
+    white-space:nowrap;
+  }
+  .potw .info{text-align:left;}
+  .potw .name{font-size:18px; font-weight:600;}
+  .potw .team{font-size:12px; color:var(--ink-faint);}
+  .potw .note{font-size:12px; color:var(--ink-dim); margin-top:2px;}
+  .potw.empty{color:var(--ink-faint); font-style:italic; font-size:13px;}
+
+  /* ===== Nav tabs ===== */
+  nav.tabs{
+    display:flex; justify-content:center; gap:2px; flex-wrap:wrap;
+    background:var(--bg-elevated);
+    padding:6px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:20;
+  }
+  nav.tabs button{
+    background:none; border:none; color:var(--ink-dim);
+    font-family:'Anton',sans-serif; letter-spacing:1px; font-size:13px;
+    padding:10px 16px; border-radius:6px;
+  }
+  nav.tabs button:hover{color:var(--ink); background:rgba(255,255,255,0.03);}
+  nav.tabs button.active{color:#08150f; background:var(--turf);}
+
+  main{max-width:1100px; margin:0 auto; padding:22px 16px 60px;}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .section-title{
+    font-size:20px; margin:0 0 14px; color:var(--ink);
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title small{
+    font-family:'Work Sans'; text-transform:none; letter-spacing:0; font-size:12px;
+    color:var(--ink-faint); font-weight:400;
+  }
+
+  .card{
+    background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px; margin-bottom:18px;
+  }
+  .grid-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:20px;}
+  .stat-box{background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+  .stat-box .num{font-family:'JetBrains Mono'; font-size:26px; color:var(--turf); font-weight:700;}
+  .stat-box .label{font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:1px; margin-top:4px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th,td{padding:9px 8px; text-align:center; border-bottom:1px solid var(--line);}
+  th{color:var(--ink-faint); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:0.5px;}
+  td.team-name,th.team-name{text-align:left;}
+  tbody tr:hover{background:rgba(255,255,255,0.02);}
+  .num-cell{font-family:'JetBrains Mono'; font-variant-numeric:tabular-nums;}
+  .pts-cell{font-family:'JetBrains Mono'; color:var(--amber); font-weight:700;}
+  .rank-1{border-left:3px solid var(--turf);}
+  table.mini th, table.mini td{padding:7px 6px;}
+
+  /* Scoreboard match card - signature element */
+  .matchday-group{margin-bottom:22px;}
+  .matchday-label{
+    font-family:'Anton'; font-size:13px; color:var(--ink-faint); letter-spacing:1.5px;
+    margin:0 0 10px 2px; display:flex; align-items:center; gap:8px;
+  }
+  .matchday-label::after{content:''; flex:1; height:1px; background:var(--line);}
+  .match-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px;}
+  .match-card{
+    background:#08120d;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+  }
+  .match-teams{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .match-team{flex:1; font-size:13px; font-weight:600; text-align:center;}
+  .match-score{
+    font-family:'JetBrains Mono'; font-size:26px; font-weight:700;
+    background:#000; border-radius:6px; padding:4px 12px; color:var(--amber);
+    min-width:70px; text-align:center; letter-spacing:2px;
+    border:1px solid #1c2b22;
+  }
+  .match-score.unplayed{color:var(--ink-faint); font-size:14px;}
+  .match-extra{margin-top:10px; font-size:11px; color:var(--ink-dim); line-height:1.6;}
+  .goal-tag{display:inline-block; background:rgba(47,191,110,0.1); border:1px solid var(--turf-dim); border-radius:20px; padding:2px 8px; margin:2px 3px 0 0;}
+  .assist-tag{display:inline-block; background:rgba(255,183,3,0.08); border:1px solid var(--amber-dim); border-radius:20px; padding:2px 8px; margin:2px 3px 0 0;}
+  .admin-editor{margin-top:12px; border-top:1px dashed var(--line); padding-top:10px;}
+  .admin-editor input, .admin-editor select{
+    background:var(--bg-elevated); border:1px solid var(--line); color:var(--ink);
+    border-radius:6px; padding:6px 8px; font-size:12px;
+  }
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px;}
+
+  .btn{
+    background:var(--turf); color:#08150f; border:none; border-radius:6px;
+    padding:8px 14px; font-weight:700; font-size:12px; letter-spacing:0.3px;
+  }
+  .btn:hover{background:#28d97a;}
+  .btn.secondary{background:none; border:1px solid var(--line); color:var(--ink-dim);}
+  .btn.secondary:hover{border-color:var(--turf); color:var(--ink);}
+  .btn.danger{background:var(--red); color:#fff;}
+  .btn.small{padding:4px 9px; font-size:11px;}
+
+  .badge-yellow{background:var(--yellow); color:#1a1408; font-weight:700; font-size:10px; padding:2px 7px; border-radius:4px;}
+  .badge-red{background:var(--red); color:#fff; font-weight:700; font-size:10px; padding:2px 7px; border-radius:4px;}
+  .badge-paid{background:rgba(47,191,110,0.15); color:var(--turf); border:1px solid var(--turf-dim); font-size:10px; padding:2px 7px; border-radius:4px;}
+  .badge-unpaid{background:rgba(229,67,58,0.12); color:#ff8a80; border:1px solid #5a2622; font-size:10px; padding:2px 7px; border-radius:4px;}
+
+  .tabs-sub{display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap;}
+  .tabs-sub button{
+    background:var(--bg-card); border:1px solid var(--line); color:var(--ink-dim);
+    padding:6px 14px; border-radius:20px; font-size:12px;
+  }
+  .tabs-sub button.active{background:var(--turf); color:#08150f; border-color:var(--turf); font-weight:600;}
+
+  .empty-state{color:var(--ink-faint); font-size:13px; font-style:italic; padding:20px 0; text-align:center;}
+
+  .login-box{max-width:340px; margin:40px auto; text-align:center;}
+  .login-box input{width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid var(--line); background:var(--bg-elevated); color:var(--ink);}
+
+  .teams-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;}
+  .team-panel{background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius); padding:12px 14px;}
+  .team-panel h4{margin:0 0 6px; font-family:'Anton'; font-size:14px; letter-spacing:0.5px;}
+  .team-panel input.rename{width:100%; margin-bottom:8px; background:var(--bg-elevated); border:1px solid var(--line); color:var(--ink); border-radius:6px; padding:5px 7px; font-size:13px;}
+  .team-panel ul{list-style:none; margin:0; padding:0; font-size:12px;}
+  .team-panel li{display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px solid var(--line);}
+  .team-panel .count{font-size:11px; color:var(--ink-faint); float:right;}
+
+  footer{text-align:center; padding:20px; color:var(--ink-faint); font-size:11px;}
+
+  ::placeholder{color:var(--ink-faint);}
+  label{font-size:12px; color:var(--ink-dim); display:block; margin-bottom:3px;}
+
+  @media(max-width:640px){
+    .potw{flex-direction:column; text-align:center;}
+    .match-teams{flex-direction:column;}
+  }
+</style>
 </head>
 <body>
-    <header class="hero">
-        <div>
-            <p class="eyebrow">200 Level Football League</p>
-            <h1>Elite League Dashboard</h1>
-        </div>
-        <div class="hero-meta">
-            <div class="info-card">
-                <h2>Transfer Account</h2>
-                <p id="account-display">Transfer fees to: 2084462297 (Kuda-Marcel Prosper Somtochukwu)</p>
-            </div>
-            <div class="info-card">
-                <h2>League Balance</h2>
-                <p id="header-balance">₦0</p>
-            </div>
-            <div class="info-card">
-                <h2>Player of the Week</h2>
-                <p id="potw-display">TBD</p>
-            </div>
-        </div>
-    </header>
 
-    <main>
-        <section class="panel admin-panel">
-            <h2>Admin Access</h2>
-            <div id="admin-login-block">
-                <input type="password" id="admin-pass" placeholder="Admin password">
-                <button id="admin-login-btn" type="button">Unlock Admin</button>
-            </div>
-            <div id="admin-controls" hidden>
-                <form id="player-form" class="inline-form">
-                    <input id="player-name" type="text" placeholder="Player name" required>
-                    <label class="checkbox-row"><input id="paid-fee" type="checkbox"> Paid 3,000 entry fee</label>
-                    <button type="submit">Register Player</button>
-                </form>
+<div class="paybar">
+  <span>💳 Pay entry / disciplinary fees to:</span>
+  <span id="payDetails"><strong>Loading…</strong></span>
+  <button onclick="copyAccount()">Copy account no.</button>
+  <span style="width:1px; height:16px; background:var(--line);"></span>
+  <span>💰 League balance:</span>
+  <span id="liveBalance" class="mono" style="color:var(--amber); font-weight:700;">—</span>
+</div>
 
-                <form id="potw-form" class="inline-form">
-                    <select id="potw-player"></select>
-                    <button type="submit">Set Player of the Week</button>
-                </form>
+<header class="hero">
+  <h1 class="league-title">200LVL <span>FOOTBALL LEAGUE</span></h1>
+  <div class="league-sub">Season Table · Fixtures · Stats · Discipline</div>
+  <div id="potwBox" class="potw"></div>
+</header>
 
-                <form id="team-rename-form" class="inline-form">
-                    <select id="team-rename-select"></select>
-                    <input id="team-new-name" type="text" placeholder="New team name" required>
-                    <button type="submit">Rename Team</button>
-                </form>
+<nav class="tabs">
+  <button data-tab="home" class="active">Home</button>
+  <button data-tab="myteam">Find My Team</button>
+  <button data-tab="table">Table</button>
+  <button data-tab="fixtures">Fixtures</button>
+  <button data-tab="stats">Top Scorers</button>
+  <button data-tab="discipline">Discipline</button>
+  <button data-tab="finance">Finance</button>
+  <button data-tab="admin">Admin</button>
+</nav>
 
-                <button id="generate-fixtures-btn" type="button">Create / Refresh Fixtures</button>
-            </div>
-        </section>
+<main>
 
-        <section class="panel">
-            <h2>League Rules</h2>
-            <ul class="rules-list">
-                <li>Every registered player must pay the 3,000 entry fee to join the league.</li>
-                <li>Paid players are assigned to a random team with a maximum of 10 players per team.</li>
-                <li>Yellow cards cost 500 and red cards cost 1,000.</li>
-                <li>Players with 2 yellow cards or 1 red card are suspended for the next match and will pay fines for both yellow card and red card.</li>
-                <li>Fighting of any such incidents will result in additional disciplinary action(3k fine for each offender).</li>
-                <li>Fine for foul language on referee or any official: 1,000</li>
-            </ul>
-        </section>
+  <!-- HOME -->
+  <section class="tabpanel active" id="tab-home">
+    <div class="grid-stats" id="homeStats"></div>
+    <h2 class="section-title">League Table <small>Top 5</small></h2>
+    <div class="card" id="homeTableCard"></div>
+    <h2 class="section-title">Recent Results</h2>
+    <div class="card" id="homeRecent"></div>
+  </section>
 
-        <section class="panel">
-            <h2>League Table</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Team</th>
-                        <th>P</th>
-                        <th>W</th>
-                        <th>D</th>
-                        <th>L</th>
-                        <th>GF</th>
-                        <th>GA</th>
-                        <th>GD</th>
-                        <th>Pts</th>
-                    </tr>
-                </thead>
-                <tbody id="league-table"></tbody>
-            </table>
-        </section>
+  <!-- FIND MY TEAM -->
+  <section class="tabpanel" id="tab-myteam">
+    <h2 class="section-title">Find My Team</h2>
+    <div class="card">
+      <p style="color:var(--ink-dim); font-size:13px; margin-top:0;">Type your name below to see which team you were placed in.</p>
+      <div class="row">
+        <input type="text" id="myteam-search" placeholder="Type your name…" style="min-width:240px;" oninput="renderMyTeamResults(this.value)">
+      </div>
+      <div id="myteam-results" style="margin-top:14px;"></div>
+    </div>
+  </section>
 
-        <section class="panel">
-            <div class="two-columns">
-                <div>
-                    <h2>Team Rosters</h2>
-                    <div id="team-list" class="team-grid"></div>
-                </div>
-                <div>
-                    <h2>Top Goal Scorers</h2>
-                    <table>
-                        <thead>
-                            <tr><th>Player</th><th>Goals</th></tr>
-                        </thead>
-                        <tbody id="scorers-table"></tbody>
-                    </table>
+  <!-- TABLE -->
+  <section class="tabpanel" id="tab-table">
+    <h2 class="section-title">League Table</h2>
+    <div class="card"><div id="fullTable"></div></div>
+  </section>
 
-                    <h2>Top Assist King</h2>
-                    <table>
-                        <thead>
-                            <tr><th>Player</th><th>Assists</th></tr>
-                        </thead>
-                        <tbody id="assists-table"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+  <!-- FIXTURES -->
+  <section class="tabpanel" id="tab-fixtures">
+    <h2 class="section-title">Fixtures &amp; Results</h2>
+    <div id="fixturesEmpty" class="empty-state" style="display:none;">No fixtures yet. Generate them from the Admin panel once you're logged in.</div>
+    <div id="fixturesList"></div>
+  </section>
 
-        <section class="panel">
-            <h2>Disciplinary Records</h2>
-            <form id="card-form" class="inline-form">
-                <select id="card-player"></select>
-                <select id="card-type">
-                    <option value="yellow">Yellow Card (500)</option>
-                    <option value="red">Red Card (1000)</option>
-                </select>
-                <button type="submit">Record Card</button>
-            </form>
-            <table>
-                <thead>
-                    <tr><th>Player</th><th>Card</th><th>Fee</th><th>Status</th></tr>
-                </thead>
-                <tbody id="disciplinary-table"></tbody>
-            </table>
-        </section>
+  <!-- STATS -->
+  <section class="tabpanel" id="tab-stats">
+    <h2 class="section-title">Top Goal Scorers</h2>
+    <div id="scorersAdminForm"></div>
+    <div class="card"><div id="scorersTable"></div></div>
+    <h2 class="section-title">Top Assisters</h2>
+    <div id="assistsAdminForm"></div>
+    <div class="card"><div id="assistsTable"></div></div>
+  </section>
 
-        <section class="panel">
-            <h2>Fixtures and Results</h2>
-            <div class="fixture-filter">
-                <label for="week-select">Choose Week:</label>
-                <select id="week-select"></select>
-            </div>
-            <div class="fixture-table-wrapper">
-                <table class="fixtures-table">
-                    <thead>
-                        <tr>
-                            <th>Fixture</th>
-                            <th>Score</th>
-                            <th>Scorers</th>
-                            <th>Assists</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="fixtures-list"></tbody>
-                </table>
-            </div>
-        </section>
+  <!-- DISCIPLINE -->
+  <section class="tabpanel" id="tab-discipline">
+    <h2 class="section-title">Yellow &amp; Red Cards <small>Yellow ₦500 · Red ₦1,000</small></h2>
+    <div id="adminCardForm"></div>
+    <div class="card"><div id="cardsTable"></div></div>
+  </section>
 
-        <section class="panel" id="knockout-section" style="display: none;">
-            <h2>Knockout Rounds (Top 6)</h2>
-            <div class="fixture-table-wrapper">
-                <table class="fixtures-table">
-                    <thead>
-                        <tr>
-                            <th>Round</th>
-                            <th>Matchup</th>
-                            <th>Score</th>
-                            <th>Scorers</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="knockout-list"></tbody>
-                </table>
-            </div>
-        </section>
-            <div class="revenue-stats">
-                <div class="stat-item">
-                    <h4>Registration Revenue</h4>
-                    <p id="analytics-registration">₦0</p>
-                </div>
-                <div class="stat-item">
-                    <h4>Disciplinary Revenue</h4>
-                    <p id="analytics-disciplinary">₦0</p>
-                </div>
-                <div class="stat-item">
-                    <h4>Total Revenue</h4>
-                    <p id="analytics-total">₦0</p>
-                </div>
-            </div>
-        </section>
+  <!-- FINANCE -->
+  <section class="tabpanel" id="tab-finance">
+    <h2 class="section-title">League Finances</h2>
+    <div class="grid-stats" id="financeStats"></div>
+    <div id="adminExpenseForm"></div>
+    <div class="card">
+      <h3 style="margin-top:0; font-size:14px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:1px;">Expenses / Payouts</h3>
+      <div id="expensesTable"></div>
+    </div>
+  </section>
 
-        <section class="panel">
-            <h2>Finance</h2>
-            <div class="finance-grid">
-                <div class="info-card">
-                    <h3>Registration Fee</h3>
-                    <p id="registration-revenue">0</p>
-                </div>
-                <div class="info-card">
-                    <h3>Disciplinary Fees</h3>
-                    <p id="disciplinary-revenue">0</p>
-                </div>
-                <div class="info-card">
-                    <h3>League Balance</h3>
-                    <p id="league-balance">0</p>
-                </div>
-            </div>
-        </section>
-    </main>
+  <!-- ADMIN -->
+  <section class="tabpanel" id="tab-admin">
+    <div id="adminArea"></div>
+  </section>
 
-    <!-- Player Profile Modal -->
-    <div id="player-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <h2 id="modal-player-name"></h2>
-            <div id="modal-player-details"></div>
-        </div>
+</main>
+
+<footer>200lvl Football League · data is stored only in this browser (localStorage) · not synced across devices</footer>
+
+<script>
+/* ================= STATE ================= */
+const STORAGE_KEY = 'lvl200LeagueData_v1';
+let isAdmin = sessionStorage.getItem('lvl200IsAdmin') === '1';
+
+function defaultState(){
+  const teams = [];
+  for(let i=1;i<=8;i++){ teams.push({id:'t'+i, name:'Team '+i}); }
+  return {
+    settings:{
+      adminPassword:'admin123',
+      bankName:'', accountNumber:'', accountName:'',
+      entryFee:3000, yellowFee:500, redFee:1000,
+      potw:{name:'', team:'', note:''}
+    },
+    teams, players:[], fixtures:[], cards:[], expenses:[],
+    manualGoals:[], manualAssists:[]
+  };
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    // merge in case of missing fields from older versions
+    const d = defaultState();
+    return Object.assign(d, parsed, {settings: Object.assign(d.settings, parsed.settings||{})});
+  }catch(e){ return defaultState(); }
+}
+let state = loadState();
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function esc(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function naira(n){ return '₦' + Number(n||0).toLocaleString(); }
+function getTeam(id){ return state.teams.find(t=>t.id===id); }
+function getPlayer(id){ return state.players.find(p=>p.id===id); }
+function teamPlayers(teamId){ return state.players.filter(p=>p.teamId===teamId); }
+
+/* ================= TABS ================= */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ================= CORE LOGIC ================= */
+function assignRandomTeam(){
+  const counts = {};
+  state.teams.forEach(t=> counts[t.id] = teamPlayers(t.id).length);
+  const available = state.teams.filter(t=> counts[t.id] < 10);
+  if(available.length===0) return null;
+  return available[Math.floor(Math.random()*available.length)].id;
+}
+
+function addPlayer(name, paid){
+  name = name.trim();
+  if(!name) return alert('Enter a player name.');
+  const id = 'p'+Date.now()+Math.floor(Math.random()*1000);
+  let teamId = null;
+  if(paid){
+    teamId = assignRandomTeam();
+    if(teamId===null){ alert('All 8 teams are full (80 players). Player added but not assigned.'); }
+  }
+  state.players.push({id, name, paid:!!paid, teamId, addedAt:Date.now()});
+  saveState(); renderAll();
+}
+function markPaidAndAssign(playerId){
+  const p = getPlayer(playerId); if(!p) return;
+  const teamId = assignRandomTeam();
+  if(teamId===null) return alert('All teams are full. Cannot assign.');
+  p.paid = true; p.teamId = teamId;
+  saveState(); renderAll();
+}
+function movePlayer(playerId, newTeamId){
+  const p = getPlayer(playerId); if(!p) return;
+  if(newTeamId && teamPlayers(newTeamId).length>=10 && p.teamId!==newTeamId){
+    alert('That team already has 10 players.'); renderAll(); return;
+  }
+  p.teamId = newTeamId || null;
+  saveState(); renderAll();
+}
+function deletePlayer(playerId){
+  if(!confirm('Remove this player completely?')) return;
+  state.players = state.players.filter(p=>p.id!==playerId);
+  state.fixtures.forEach(f=>{
+    f.scorers = f.scorers.filter(s=>s.playerId!==playerId);
+    f.assists = f.assists.filter(a=>a.playerId!==playerId);
+  });
+  state.cards = state.cards.filter(c=>c.playerId!==playerId);
+  saveState(); renderAll();
+}
+function renameTeam(teamId, newName){
+  const t = getTeam(teamId); if(!t) return;
+  t.name = newName.trim() || t.name;
+  saveState(); renderAll();
+}
+
+function generateFixtures(){
+  if(state.fixtures.length>0 && !confirm('This will erase all existing fixtures and results. Continue?')) return;
+  const teamIds = state.teams.map(t=>t.id);
+  const n = teamIds.length;
+  let arr = teamIds.slice();
+  const rounds1 = [];
+  for(let r=0;r<n-1;r++){
+    const roundMatches=[];
+    for(let i=0;i<n/2;i++){
+      const home = arr[i], away = arr[n-1-i];
+      roundMatches.push(r%2===0 ? [home,away] : [away,home]);
+    }
+    rounds1.push(roundMatches);
+    const fixed = arr[0];
+    const rest = arr.slice(1);
+    rest.unshift(rest.pop());
+    arr = [fixed, ...rest];
+  }
+  const fixtures = [];
+  let id = 1, matchday = 1;
+  rounds1.forEach(roundMatches=>{
+    roundMatches.forEach(([home,away])=>{
+      fixtures.push({id:'f'+(id++), matchday, leg:1, home, away, homeScore:null, awayScore:null, played:false, scorers:[], assists:[]});
+    });
+    matchday++;
+  });
+  rounds1.forEach(roundMatches=>{
+    roundMatches.forEach(([home,away])=>{
+      fixtures.push({id:'f'+(id++), matchday, leg:2, home:away, away:home, homeScore:null, awayScore:null, played:false, scorers:[], assists:[]});
+    });
+    matchday++;
+  });
+  state.fixtures = fixtures;
+  saveState(); renderAll();
+  alert('Fixtures generated: '+fixtures.length+' matches across '+matchday+ ' matchdays.');
+}
+
+function saveResult(fixtureId, hs, as){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  if(hs==='' || as==='' || isNaN(hs) || isNaN(as)) return alert('Enter valid scores.');
+  f.homeScore = parseInt(hs); f.awayScore = parseInt(as); f.played = true;
+  saveState(); renderAll();
+}
+function clearResult(fixtureId){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  if(!confirm('Clear this result and its scorers/assists?')) return;
+  f.homeScore=null; f.awayScore=null; f.played=false; f.scorers=[]; f.assists=[];
+  saveState(); renderAll();
+}
+function addScorer(fixtureId, playerId, goals){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  if(!playerId) return alert('Select a player.');
+  goals = parseInt(goals)||1;
+  const p = getPlayer(playerId);
+  f.scorers.push({playerId, teamId:p?p.teamId:null, goals});
+  saveState(); renderAll();
+}
+function addAssist(fixtureId, playerId){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  if(!playerId) return alert('Select a player.');
+  const p = getPlayer(playerId);
+  f.assists.push({playerId, teamId:p?p.teamId:null});
+  saveState(); renderAll();
+}
+function removeScorer(fixtureId, idx){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  f.scorers.splice(idx,1); saveState(); renderAll();
+}
+function removeAssist(fixtureId, idx){
+  const f = state.fixtures.find(x=>x.id===fixtureId); if(!f) return;
+  f.assists.splice(idx,1); saveState(); renderAll();
+}
+
+function addCard(playerId, type, paid){
+  if(!playerId) return alert('Select a player.');
+  const fee = type==='yellow' ? state.settings.yellowFee : state.settings.redFee;
+  const p = getPlayer(playerId);
+  state.cards.push({id:'c'+Date.now()+Math.floor(Math.random()*999), playerId, teamId:p?p.teamId:null, type, fee, paid:!!paid, date:Date.now()});
+  saveState(); renderAll();
+}
+function toggleCardPaid(cardId){
+  const c = state.cards.find(x=>x.id===cardId); if(!c) return;
+  c.paid = !c.paid; saveState(); renderAll();
+}
+function deleteCard(cardId){
+  if(!confirm('Delete this card record?')) return;
+  state.cards = state.cards.filter(c=>c.id!==cardId); saveState(); renderAll();
+}
+
+function addExpense(desc, amount){
+  desc = desc.trim(); amount = parseFloat(amount);
+  if(!desc || isNaN(amount) || amount<=0) return alert('Enter a valid description and amount.');
+  state.expenses.push({id:'e'+Date.now(), desc, amount});
+  saveState(); renderAll();
+}
+function deleteExpense(id){
+  state.expenses = state.expenses.filter(e=>e.id!==id); saveState(); renderAll();
+}
+
+function computeStandings(){
+  const table = {};
+  state.teams.forEach(t=> table[t.id] = {id:t.id, name:t.name, p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0});
+  state.fixtures.filter(f=>f.played).forEach(f=>{
+    const h = table[f.home], a = table[f.away];
+    if(!h||!a) return;
+    h.p++; a.p++;
+    h.gf+=f.homeScore; h.ga+=f.awayScore;
+    a.gf+=f.awayScore; a.ga+=f.homeScore;
+    if(f.homeScore>f.awayScore){ h.w++; h.pts+=3; a.l++; }
+    else if(f.homeScore<f.awayScore){ a.w++; a.pts+=3; h.l++; }
+    else { h.d++; a.d++; h.pts+=1; a.pts+=1; }
+  });
+  Object.values(table).forEach(t=> t.gd = t.gf - t.ga);
+  return Object.values(table).sort((x,y)=> y.pts-x.pts || y.gd-x.gd || y.gf-x.gf || x.name.localeCompare(y.name));
+}
+function computeTopScorers(){
+  const map = {};
+  state.fixtures.forEach(f=> f.scorers.forEach(s=>{
+    const p = getPlayer(s.playerId); if(!p) return;
+    const key = p.name.trim().toLowerCase()+'|'+(getTeam(p.teamId)?.name||'').toLowerCase();
+    if(!map[key]) map[key] = {name:p.name, team:getTeam(p.teamId)?.name||'—', goals:0, manualIds:[]};
+    map[key].goals += s.goals;
+  }));
+  state.manualGoals.forEach(m=>{
+    const key = m.name.trim().toLowerCase()+'|'+(m.team||'').toLowerCase();
+    if(!map[key]) map[key] = {name:m.name, team:m.team||'—', goals:0, manualIds:[]};
+    map[key].goals += m.value;
+    map[key].manualIds.push(m.id);
+  });
+  return Object.values(map).sort((a,b)=>b.goals-a.goals);
+}
+function computeTopAssists(){
+  const map = {};
+  state.fixtures.forEach(f=> f.assists.forEach(a=>{
+    const p = getPlayer(a.playerId); if(!p) return;
+    const key = p.name.trim().toLowerCase()+'|'+(getTeam(p.teamId)?.name||'').toLowerCase();
+    if(!map[key]) map[key] = {name:p.name, team:getTeam(p.teamId)?.name||'—', assists:0, manualIds:[]};
+    map[key].assists += 1;
+  }));
+  state.manualAssists.forEach(m=>{
+    const key = m.name.trim().toLowerCase()+'|'+(m.team||'').toLowerCase();
+    if(!map[key]) map[key] = {name:m.name, team:m.team||'—', assists:0, manualIds:[]};
+    map[key].assists += m.value;
+    map[key].manualIds.push(m.id);
+  });
+  return Object.values(map).sort((a,b)=>b.assists-a.assists);
+}
+function addManualGoal(name, team, value){
+  name = (name||'').trim(); value = parseInt(value);
+  if(!name) return alert('Enter a player name.');
+  if(!value || value<1) return alert('Enter a valid goal count.');
+  state.manualGoals.push({id:'mg'+Date.now()+Math.floor(Math.random()*999), name, team:team||'', value});
+  saveState(); renderAll();
+}
+function deleteManualGoal(id){
+  state.manualGoals = state.manualGoals.filter(m=>m.id!==id); saveState(); renderAll();
+}
+function addManualAssist(name, team, value){
+  name = (name||'').trim(); value = parseInt(value);
+  if(!name) return alert('Enter a player name.');
+  if(!value || value<1) return alert('Enter a valid assist count.');
+  state.manualAssists.push({id:'ma'+Date.now()+Math.floor(Math.random()*999), name, team:team||'', value});
+  saveState(); renderAll();
+}
+function deleteManualAssist(id){
+  state.manualAssists = state.manualAssists.filter(m=>m.id!==id); saveState(); renderAll();
+}
+function computeBalance(){
+  const entryIncome = state.players.filter(p=>p.paid).length * state.settings.entryFee;
+  const cardIncome = state.cards.filter(c=>c.paid).reduce((s,c)=>s+c.fee,0);
+  const totalExpenses = state.expenses.reduce((s,e)=>s+e.amount,0);
+  return (entryIncome + cardIncome) - totalExpenses;
+}
+
+/* ================= RENDER ================= */
+function renderAll(){
+  renderPayBar(); renderPotw(); renderLiveBalance();
+  renderHome(); renderFullTable(); renderFixtures(); renderStats();
+  renderDiscipline(); renderFinance(); renderAdmin();
+  renderMyTeamResults(document.getElementById('myteam-search')?document.getElementById('myteam-search').value:'');
+}
+
+function renderPayBar(){
+  const s = state.settings;
+  const el = document.getElementById('payDetails');
+  if(!s.accountNumber && !s.bankName){
+    el.innerHTML = '<em>Not set yet — add it in Admin → Settings</em>';
+  }else{
+    el.innerHTML = `<strong>${esc(s.accountNumber)}</strong> · ${esc(s.accountName)} · ${esc(s.bankName)}`;
+  }
+}
+function renderLiveBalance(){
+  const el = document.getElementById('liveBalance');
+  if(el) el.textContent = naira(computeBalance());
+}
+function renderMyTeamResults(query){
+  const box = document.getElementById('myteam-results');
+  if(!box) return;
+  query = (query||'').trim().toLowerCase();
+  if(!query){ box.innerHTML = ''; return; }
+  const matches = state.players.filter(p=> p.name.toLowerCase().includes(query));
+  if(matches.length===0){
+    box.innerHTML = `<div class="empty-state">No player found with that name. Check the spelling, or your registration/payment may still be pending.</div>`;
+    return;
+  }
+  box.innerHTML = matches.map(p=>{
+    if(!p.paid || !p.teamId){
+      return `<div class="team-panel" style="margin-bottom:10px;">
+        <div style="font-weight:600;">${esc(p.name)}</div>
+        <div class="badge-unpaid" style="display:inline-block; margin-top:6px;">Payment pending — not yet assigned to a team</div>
+      </div>`;
+    }
+    const team = getTeam(p.teamId);
+    const mates = teamPlayers(p.teamId).filter(m=>m.id!==p.id);
+    return `<div class="team-panel" style="margin-bottom:10px;">
+      <div style="font-size:12px; color:var(--ink-faint);">${esc(p.name)} is on</div>
+      <h4 style="margin:2px 0 8px;">${esc(team?.name)}</h4>
+      <div style="font-size:12px; color:var(--ink-dim); margin-bottom:4px;">Teammates:</div>
+      <ul>${mates.length? mates.map(m=>`<li>${esc(m.name)}</li>`).join('') : '<li style="border:none; color:var(--ink-faint);">No teammates yet</li>'}</ul>
+    </div>`;
+  }).join('');
+}
+function copyAccount(){
+  const s = state.settings;
+  if(!s.accountNumber) return alert('No account number set yet.');
+  navigator.clipboard.writeText(s.accountNumber).then(()=> alert('Account number copied: '+s.accountNumber));
+}
+function renderPotw(){
+  const p = state.settings.potw || {};
+  const box = document.getElementById('potwBox');
+  if(!p.name){
+    box.className='potw empty';
+    box.innerHTML = 'Player of the Week not announced yet';
+    return;
+  }
+  box.className='potw';
+  box.innerHTML = `
+    <div class="badge">⭐ Player<br>of the Week</div>
+    <div class="info">
+      <div class="name">${esc(p.name)}</div>
+      <div class="team">${esc(p.team||'')}</div>
+      ${p.note? `<div class="note">"${esc(p.note)}"</div>`:''}
+    </div>`;
+}
+
+function tableRowsHtml(standings, limit){
+  const rows = limit? standings.slice(0,limit) : standings;
+  return rows.map((t,i)=>`
+    <tr class="${i===0?'rank-1':''}">
+      <td class="num-cell">${i+1}</td>
+      <td class="team-name">${esc(t.name)}</td>
+      <td class="num-cell">${t.p}</td>
+      <td class="num-cell">${t.w}</td>
+      <td class="num-cell">${t.d}</td>
+      <td class="num-cell">${t.l}</td>
+      <td class="num-cell">${t.gf}</td>
+      <td class="num-cell">${t.ga}</td>
+      <td class="num-cell">${t.gd>0?'+':''}${t.gd}</td>
+      <td class="pts-cell">${t.pts}</td>
+    </tr>`).join('');
+}
+function tableHeaderHtml(){
+  return `<tr><th>#</th><th class="team-name">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr>`;
+}
+
+function renderHome(){
+  const standings = computeStandings();
+  const playedMatches = state.fixtures.filter(f=>f.played).length;
+  const paidPlayers = state.players.filter(p=>p.paid).length;
+  document.getElementById('homeStats').innerHTML = `
+    <div class="stat-box"><div class="num">${state.teams.length}</div><div class="label">Teams</div></div>
+    <div class="stat-box"><div class="num">${state.players.length}</div><div class="label">Players (${paidPlayers} paid)</div></div>
+    <div class="stat-box"><div class="num">${playedMatches}/${state.fixtures.length}</div><div class="label">Matches played</div></div>
+    <div class="stat-box"><div class="num">${state.cards.length}</div><div class="label">Cards issued</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--amber);">${naira(computeBalance())}</div><div class="label">League balance</div></div>
+  `;
+  document.getElementById('homeTableCard').innerHTML = standings.length ?
+    `<table><thead>${tableHeaderHtml()}</thead><tbody>${tableRowsHtml(standings,5)}</tbody></table>`
+    : `<div class="empty-state">No results yet.</div>`;
+
+  const recent = state.fixtures.filter(f=>f.played).slice(-5).reverse();
+  document.getElementById('homeRecent').innerHTML = recent.length ? recent.map(f=>`
+    <div class="row" style="justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:8px;">
+      <span>${esc(getTeam(f.home)?.name)} <span class="mono" style="color:var(--amber)">${f.homeScore} - ${f.awayScore}</span> ${esc(getTeam(f.away)?.name)}</span>
+      <span style="color:var(--ink-faint); font-size:11px;">Matchday ${f.matchday}</span>
+    </div>`).join('') : `<div class="empty-state">No matches played yet.</div>`;
+}
+
+function renderFullTable(){
+  const standings = computeStandings();
+  document.getElementById('fullTable').innerHTML = `<table><thead>${tableHeaderHtml()}</thead><tbody>${tableRowsHtml(standings)}</tbody></table>`;
+}
+
+function playerOptionsHtml(teamId, selected){
+  const players = teamId ? teamPlayers(teamId) : state.players;
+  return `<option value="">Select player…</option>` + players.map(p=>
+    `<option value="${p.id}" ${selected===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
+}
+
+function renderFixtures(){
+  const empty = document.getElementById('fixturesEmpty');
+  const list = document.getElementById('fixturesList');
+  if(state.fixtures.length===0){ empty.style.display='block'; list.innerHTML=''; return; }
+  empty.style.display='none';
+  const byMatchday = {};
+  state.fixtures.forEach(f=>{ (byMatchday[f.matchday] = byMatchday[f.matchday]||[]).push(f); });
+  const matchdays = Object.keys(byMatchday).map(Number).sort((a,b)=>a-b);
+  list.innerHTML = matchdays.map(md=>{
+    const matches = byMatchday[md];
+    return `<div class="matchday-group">
+      <div class="matchday-label">Matchday ${md}${matches[0].leg===2?' (Return leg)':''}</div>
+      <div class="match-grid">
+        ${matches.map(f=> matchCardHtml(f)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function matchCardHtml(f){
+  const home = getTeam(f.home), away = getTeam(f.away);
+  const scoreHtml = f.played
+    ? `<div class="match-score">${f.homeScore} - ${f.awayScore}</div>`
+    : `<div class="match-score unplayed">VS</div>`;
+
+  let scorersHtml = '';
+  if(f.scorers.length){
+    scorersHtml += f.scorers.map((s,idx)=>{
+      const p = getPlayer(s.playerId);
+      return `<span class="goal-tag">⚽ ${esc(p?p.name:'?')}${s.goals>1?' x'+s.goals:''} ${isAdmin?`<a href="#" onclick="removeScorer('${f.id}',${idx});return false;" style="color:var(--red);">×</a>`:''}</span>`;
+    }).join('');
+  }
+  if(f.assists.length){
+    scorersHtml += f.assists.map((a,idx)=>{
+      const p = getPlayer(a.playerId);
+      return `<span class="assist-tag">🎯 ${esc(p?p.name:'?')} ${isAdmin?`<a href="#" onclick="removeAssist('${f.id}',${idx});return false;" style="color:var(--red);">×</a>`:''}</span>`;
+    }).join('');
+  }
+
+  let adminHtml = '';
+  if(isAdmin){
+    adminHtml = `<div class="admin-editor">
+      <div class="row">
+        <input type="number" min="0" style="width:55px" id="hs-${f.id}" placeholder="H" value="${f.homeScore??''}">
+        <span style="color:var(--ink-faint)">–</span>
+        <input type="number" min="0" style="width:55px" id="as-${f.id}" placeholder="A" value="${f.awayScore??''}">
+        <button class="btn small" onclick="saveResult('${f.id}', document.getElementById('hs-${f.id}').value, document.getElementById('as-${f.id}').value)">Save score</button>
+        ${f.played? `<button class="btn secondary small" onclick="clearResult('${f.id}')">Clear</button>`:''}
+      </div>
+      ${f.played? `
+      <div class="row">
+        <select id="sc-team-${f.id}" onchange="document.getElementById('sc-player-${f.id}').innerHTML = playerOptionsHtml(this.value)">
+          <option value="">Goal — pick team…</option>
+          <option value="${f.home}">${esc(home?.name)}</option>
+          <option value="${f.away}">${esc(away?.name)}</option>
+        </select>
+        <select id="sc-player-${f.id}"><option value="">Select player…</option></select>
+        <input type="number" id="sc-goals-${f.id}" min="1" value="1" style="width:50px">
+        <button class="btn small" onclick="addScorer('${f.id}', document.getElementById('sc-player-${f.id}').value, document.getElementById('sc-goals-${f.id}').value)">+ Add goal</button>
+      </div>
+      <div class="row">
+        <select id="as2-team-${f.id}" onchange="document.getElementById('as2-player-${f.id}').innerHTML = playerOptionsHtml(this.value)">
+          <option value="">Assist — pick team…</option>
+          <option value="${f.home}">${esc(home?.name)}</option>
+          <option value="${f.away}">${esc(away?.name)}</option>
+        </select>
+        <select id="as2-player-${f.id}"><option value="">Select player…</option></select>
+        <button class="btn small" onclick="addAssist('${f.id}', document.getElementById('as2-player-${f.id}').value)">+ Add assist</button>
+      </div>`:''}
+    </div>`;
+  }
+
+  return `<div class="match-card">
+    <div class="match-teams">
+      <div class="match-team">${esc(home?.name)}</div>
+      ${scoreHtml}
+      <div class="match-team">${esc(away?.name)}</div>
+    </div>
+    ${scorersHtml? `<div class="match-extra">${scorersHtml}</div>` : ''}
+    ${adminHtml}
+  </div>`;
+}
+
+function teamOptionsHtml(){
+  return `<option value="">Team (optional)…</option>` + state.teams.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+}
+function renderStats(){
+  const scorers = computeTopScorers();
+  const assists = computeTopAssists();
+
+  const scorerAdminForm = isAdmin ? `<div class="card">
+    <h3 style="margin-top:0; font-size:13px; text-transform:uppercase; color:var(--ink-dim);">Manually add to Top Scorers</h3>
+    <div class="row">
+      <input type="text" id="mg-name" placeholder="Player name" style="min-width:180px;">
+      <select id="mg-team">${teamOptionsHtml()}</select>
+      <input type="number" id="mg-goals" min="1" value="1" style="width:70px;" placeholder="Goals">
+      <button class="btn" onclick="addManualGoal(document.getElementById('mg-name').value, document.getElementById('mg-team').value, document.getElementById('mg-goals').value); document.getElementById('mg-name').value='';">+ Add</button>
+    </div>
+    ${state.manualGoals.length? `<div style="font-size:11px; color:var(--ink-faint); margin-top:6px;">Manual entries: ${state.manualGoals.map(m=>`<span class="goal-tag">${esc(m.name)} +${m.value} <a href="#" onclick="deleteManualGoal('${m.id}');return false;" style="color:var(--red);">×</a></span>`).join('')}</div>` : ''}
+  </div>` : '';
+
+  const assistAdminForm = isAdmin ? `<div class="card">
+    <h3 style="margin-top:0; font-size:13px; text-transform:uppercase; color:var(--ink-dim);">Manually add to Top Assisters</h3>
+    <div class="row">
+      <input type="text" id="ma-name" placeholder="Player name" style="min-width:180px;">
+      <select id="ma-team">${teamOptionsHtml()}</select>
+      <input type="number" id="ma-assists" min="1" value="1" style="width:70px;" placeholder="Assists">
+      <button class="btn" onclick="addManualAssist(document.getElementById('ma-name').value, document.getElementById('ma-team').value, document.getElementById('ma-assists').value); document.getElementById('ma-name').value='';">+ Add</button>
+    </div>
+    ${state.manualAssists.length? `<div style="font-size:11px; color:var(--ink-faint); margin-top:6px;">Manual entries: ${state.manualAssists.map(m=>`<span class="assist-tag">${esc(m.name)} +${m.value} <a href="#" onclick="deleteManualAssist('${m.id}');return false;" style="color:var(--red);">×</a></span>`).join('')}</div>` : ''}
+  </div>` : '';
+
+  document.getElementById('scorersAdminForm') && (document.getElementById('scorersAdminForm').innerHTML = scorerAdminForm);
+  document.getElementById('assistsAdminForm') && (document.getElementById('assistsAdminForm').innerHTML = assistAdminForm);
+
+  document.getElementById('scorersTable').innerHTML = scorers.length ? `
+    <table class="mini"><thead><tr><th>#</th><th class="team-name">Player</th><th class="team-name">Team</th><th>Goals</th></tr></thead>
+    <tbody>${scorers.map((s,i)=>`<tr><td>${i+1}</td><td class="team-name">${esc(s.name)}</td><td class="team-name">${esc(s.team||'—')}</td><td class="num-cell" style="color:var(--turf); font-weight:700;">${s.goals}</td></tr>`).join('')}</tbody></table>
+  ` : `<div class="empty-state">No goals recorded yet.</div>`;
+
+  document.getElementById('assistsTable').innerHTML = assists.length ? `
+    <table class="mini"><thead><tr><th>#</th><th class="team-name">Player</th><th class="team-name">Team</th><th>Assists</th></tr></thead>
+    <tbody>${assists.map((s,i)=>`<tr><td>${i+1}</td><td class="team-name">${esc(s.name)}</td><td class="team-name">${esc(s.team||'—')}</td><td class="num-cell" style="color:var(--amber); font-weight:700;">${s.assists}</td></tr>`).join('')}</tbody></table>
+  ` : `<div class="empty-state">No assists recorded yet.</div>`;
+}
+
+function renderDiscipline(){
+  const formBox = document.getElementById('adminCardForm');
+  if(isAdmin){
+    formBox.innerHTML = `<div class="card">
+      <h3 style="margin-top:0; font-size:13px; text-transform:uppercase; color:var(--ink-dim);">Record a new card</h3>
+      <div class="row">
+        <select id="card-player">${playerOptionsHtml(null)}</select>
+        <select id="card-type">
+          <option value="yellow">Yellow — ₦${state.settings.yellowFee}</option>
+          <option value="red">Red — ₦${state.settings.redFee}</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:5px; margin:0;"><input type="checkbox" id="card-paid"> Paid already</label>
+        <button class="btn" onclick="addCard(document.getElementById('card-player').value, document.getElementById('card-type').value, document.getElementById('card-paid').checked)">+ Add card</button>
+      </div>
+    </div>`;
+  } else { formBox.innerHTML=''; }
+
+  const rows = state.cards.slice().sort((a,b)=>b.date-a.date);
+  document.getElementById('cardsTable').innerHTML = rows.length ? `
+    <table class="mini"><thead><tr><th class="team-name">Player</th><th class="team-name">Team</th><th>Type</th><th>Fee</th><th>Status</th>${isAdmin?'<th></th>':''}</tr></thead>
+    <tbody>${rows.map(c=>{
+      const p = getPlayer(c.playerId);
+      return `<tr>
+        <td class="team-name">${esc(p?p.name:'Unknown')}</td>
+        <td class="team-name">${esc(getTeam(c.teamId)?.name||'—')}</td>
+        <td>${c.type==='yellow'?'<span class="badge-yellow">YELLOW</span>':'<span class="badge-red">RED</span>'}</td>
+        <td class="num-cell">${naira(c.fee)}</td>
+        <td>${c.paid?'<span class="badge-paid">PAID</span>':'<span class="badge-unpaid">UNPAID</span>'}</td>
+        ${isAdmin?`<td><button class="btn secondary small" onclick="toggleCardPaid('${c.id}')">Toggle</button> <button class="btn danger small" onclick="deleteCard('${c.id}')">Del</button></td>`:''}
+      </tr>`;
+    }).join('')}</tbody></table>
+  ` : `<div class="empty-state">No cards recorded yet.</div>`;
+}
+
+function renderFinance(){
+  const paidPlayers = state.players.filter(p=>p.paid).length;
+  const entryIncome = paidPlayers * state.settings.entryFee;
+  const cardIncome = state.cards.filter(c=>c.paid).reduce((s,c)=>s+c.fee,0);
+  const cardPending = state.cards.filter(c=>!c.paid).reduce((s,c)=>s+c.fee,0);
+  const totalIncome = entryIncome + cardIncome;
+  const totalExpenses = state.expenses.reduce((s,e)=>s+e.amount,0);
+  const balance = totalIncome - totalExpenses;
+
+  document.getElementById('financeStats').innerHTML = `
+    <div class="stat-box"><div class="num">${naira(entryIncome)}</div><div class="label">Entry fees (${paidPlayers} paid)</div></div>
+    <div class="stat-box"><div class="num">${naira(cardIncome)}</div><div class="label">Disciplinary fees collected</div></div>
+    <div class="stat-box"><div class="num" style="color:#ff8a80;">${naira(cardPending)}</div><div class="label">Disciplinary fees pending</div></div>
+    <div class="stat-box"><div class="num">${naira(totalIncome)}</div><div class="label">Total income</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--red);">${naira(totalExpenses)}</div><div class="label">Total expenses</div></div>
+    <div class="stat-box"><div class="num" style="color:var(--amber);">${naira(balance)}</div><div class="label">Balance in hand</div></div>
+  `;
+
+  const formBox = document.getElementById('adminExpenseForm');
+  if(isAdmin){
+    formBox.innerHTML = `<div class="card">
+      <h3 style="margin-top:0; font-size:13px; text-transform:uppercase; color:var(--ink-dim);">Add an expense / payout</h3>
+      <div class="row">
+        <input type="text" id="exp-desc" placeholder="Description (e.g. referee fee)">
+        <input type="number" id="exp-amount" placeholder="Amount (₦)" style="width:120px">
+        <button class="btn" onclick="addExpense(document.getElementById('exp-desc').value, document.getElementById('exp-amount').value); document.getElementById('exp-desc').value=''; document.getElementById('exp-amount').value='';">+ Add</button>
+      </div>
+    </div>`;
+  } else { formBox.innerHTML=''; }
+
+  document.getElementById('expensesTable').innerHTML = state.expenses.length ? `
+    <table class="mini"><thead><tr><th class="team-name">Description</th><th>Amount</th>${isAdmin?'<th></th>':''}</tr></thead>
+    <tbody>${state.expenses.map(e=>`<tr><td class="team-name">${esc(e.desc)}</td><td class="num-cell">${naira(e.amount)}</td>${isAdmin?`<td><button class="btn danger small" onclick="deleteExpense('${e.id}')">Del</button></td>`:''}</tr>`).join('')}</tbody></table>
+  ` : `<div class="empty-state">No expenses recorded.</div>`;
+}
+
+function renderAdmin(){
+  const area = document.getElementById('adminArea');
+  if(!isAdmin){
+    area.innerHTML = `<div class="login-box">
+      <h2 class="section-title" style="justify-content:center;">Admin Login</h2>
+      <p style="color:var(--ink-faint); font-size:13px;">Enter the admin password to manage teams, players, fixtures and settings.</p>
+      <input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin();">
+      <button class="btn" style="width:100%;" onclick="doAdminLogin()">Login</button>
+    </div>`;
+    return;
+  }
+
+  const pending = state.players.filter(p=>!p.paid);
+  const s = state.settings;
+
+  area.innerHTML = `
+    <div class="row" style="justify-content:space-between;">
+      <h2 class="section-title">Admin Panel</h2>
+      <button class="btn secondary" onclick="doAdminLogout()">Log out</button>
     </div>
 
-    <script src="setup-fixtures.js"></script>
-    <script src="script.js"></script>
+    <div class="card">
+      <h3 style="margin-top:0;">Teams &amp; Players</h3>
+      <div class="teams-grid">
+        ${state.teams.map(t=>{
+          const players = teamPlayers(t.id);
+          return `<div class="team-panel">
+            <input class="rename" value="${esc(t.name)}" onchange="renameTeam('${t.id}', this.value)">
+            <div style="font-size:11px; color:var(--ink-faint); margin-bottom:6px;">${players.length}/10 players</div>
+            <ul>${players.map(p=>`<li>${esc(p.name)}
+              <span>
+                <select onchange="movePlayer('${p.id}', this.value)" style="font-size:10px; background:var(--bg-elevated); color:var(--ink); border:1px solid var(--line); border-radius:4px;">
+                  ${state.teams.map(t2=>`<option value="${t2.id}" ${t2.id===t.id?'selected':''}>${esc(t2.name)}</option>`).join('')}
+                </select>
+                <a href="#" onclick="deletePlayer('${p.id}');return false;" style="color:var(--red); margin-left:4px;">✕</a>
+              </span>
+            </li>`).join('') || '<li style="color:var(--ink-faint); border:none;">No players yet</li>'}</ul>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Register a Player</h3>
+      <p style="font-size:12px; color:var(--ink-faint); margin-top:-6px;">Entry fee: ${naira(s.entryFee)}. Paid players are placed into a random team automatically.</p>
+      <div class="row">
+        <input type="text" id="new-player-name" placeholder="Player full name" style="min-width:200px;">
+        <label style="display:flex;align-items:center;gap:5px; margin:0;"><input type="checkbox" id="new-player-paid" checked> Has paid entry fee</label>
+        <button class="btn" onclick="addPlayer(document.getElementById('new-player-name').value, document.getElementById('new-player-paid').checked); document.getElementById('new-player-name').value='';">+ Add player</button>
+      </div>
+      ${pending.length? `<div style="margin-top:12px;">
+        <div style="font-size:12px; color:var(--ink-dim); margin-bottom:6px;">Awaiting payment (${pending.length}):</div>
+        ${pending.map(p=>`<span class="row" style="display:inline-flex; background:var(--bg-elevated); border-radius:20px; padding:4px 10px; margin:2px;">
+          ${esc(p.name)} <button class="btn small" style="margin-left:6px;" onclick="markPaidAndAssign('${p.id}')">Mark paid &amp; assign</button>
+        </span>`).join('')}
+      </div>` : ''}
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Fixtures</h3>
+      <p style="font-size:12px; color:var(--ink-faint); margin-top:-6px;">Generates a full double round-robin: every team plays every other team home &amp; away.</p>
+      <button class="btn" onclick="generateFixtures()">⚙ Generate / Regenerate fixtures</button>
+      <span style="font-size:12px; color:var(--ink-faint); margin-left:10px;">${state.fixtures.length} matches currently scheduled</span>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Player of the Week</h3>
+      <div class="row">
+        <input type="text" id="potw-name" placeholder="Player name" value="${esc(s.potw.name)}">
+        <input type="text" id="potw-team" placeholder="Team" value="${esc(s.potw.team)}">
+        <input type="text" id="potw-note" placeholder="Short note (optional)" style="min-width:180px;" value="${esc(s.potw.note)}">
+        <button class="btn" onclick="savePotw()">Save</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Payment &amp; Fee Settings</h3>
+      <div class="row">
+        <div><label>Bank name</label><input type="text" id="set-bank" value="${esc(s.bankName)}"></div>
+        <div><label>Account number</label><input type="text" id="set-accno" value="${esc(s.accountNumber)}"></div>
+        <div><label>Account name</label><input type="text" id="set-accname" value="${esc(s.accountName)}"></div>
+      </div>
+      <div class="row">
+        <div><label>Entry fee (₦)</label><input type="number" id="set-entry" value="${s.entryFee}" style="width:110px;"></div>
+        <div><label>Yellow card fee (₦)</label><input type="number" id="set-yellow" value="${s.yellowFee}" style="width:110px;"></div>
+        <div><label>Red card fee (₦)</label><input type="number" id="set-red" value="${s.redFee}" style="width:110px;"></div>
+      </div>
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">Change Admin Password</h3>
+      <div class="row">
+        <input type="password" id="pw-current" placeholder="Current password">
+        <input type="password" id="pw-new" placeholder="New password">
+        <button class="btn" onclick="changePassword()">Update password</button>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#5a2622;">
+      <h3 style="margin-top:0; color:#ff8a80;">Danger Zone</h3>
+      <button class="btn danger" onclick="resetEverything()">Reset all league data</button>
+    </div>
+  `;
+}
+
+function doAdminLogin(){
+  const pass = document.getElementById('admin-pass').value;
+  if(pass === state.settings.adminPassword){
+    isAdmin = true; sessionStorage.setItem('lvl200IsAdmin','1');
+    renderAll();
+  } else { alert('Incorrect password.'); }
+}
+function doAdminLogout(){
+  isAdmin = false; sessionStorage.removeItem('lvl200IsAdmin');
+  renderAll();
+}
+function savePotw(){
+  state.settings.potw = {
+    name: document.getElementById('potw-name').value.trim(),
+    team: document.getElementById('potw-team').value.trim(),
+    note: document.getElementById('potw-note').value.trim()
+  };
+  saveState(); renderAll();
+}
+function saveSettings(){
+  const s = state.settings;
+  s.bankName = document.getElementById('set-bank').value.trim();
+  s.accountNumber = document.getElementById('set-accno').value.trim();
+  s.accountName = document.getElementById('set-accname').value.trim();
+  s.entryFee = parseFloat(document.getElementById('set-entry').value) || s.entryFee;
+  s.yellowFee = parseFloat(document.getElementById('set-yellow').value) || s.yellowFee;
+  s.redFee = parseFloat(document.getElementById('set-red').value) || s.redFee;
+  saveState(); renderAll();
+  alert('Settings saved.');
+}
+function changePassword(){
+  const cur = document.getElementById('pw-current').value;
+  const next = document.getElementById('pw-new').value;
+  if(cur !== state.settings.adminPassword) return alert('Current password is wrong.');
+  if(!next || next.length<4) return alert('New password must be at least 4 characters.');
+  state.settings.adminPassword = next;
+  saveState();
+  alert('Password updated.');
+  renderAll();
+}
+function resetEverything(){
+  if(!confirm('This will permanently erase ALL league data (teams, players, fixtures, cards, finances). Are you sure?')) return;
+  if(!confirm('Really sure? This cannot be undone.')) return;
+  state = defaultState();
+  saveState(); renderAll();
+}
+
+/* ================= INIT ================= */
+renderAll();
+</script>
 </body>
 </html>
